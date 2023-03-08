@@ -7,11 +7,13 @@
 //First, we need to require express to import it in.
 const express = require('express');
 const weather = require('./data/weather.json');
+const cors = require('cors');
 //We require dotenv and invoke the config.
 require('dotenv').config();
 
 //We then need to invoke Express and set it to a variable.
 const app = express();
+app.use(cors());
 const PORT = process.env.PORT || 3002;
 
 /***ROUTES***/
@@ -25,7 +27,11 @@ app.get('/weather', (req, res) => {
     let search = req.query.searchQuery;
     let city = weather.find(ele => search.toLowerCase() === ele.city_name.toLowerCase());
     let forecastDays = city.data.map(ele => new Forecast(ele));
-    res.send(forecastDays);
+    if (forecastDays.length > 0) {
+        res.send(forecastDays);
+    } else {
+        res.status(500).json({ message:"No forecasts found for location."} );
+    }
 });
 
 //error route
