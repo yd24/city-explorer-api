@@ -6,8 +6,8 @@
 
 //First, we need to require express to import it in.
 const express = require('express');
-const weather = require('./data/weather.json');
 const cors = require('cors');
+const axios = require('axios');
 //We require dotenv and invoke the config.
 require('dotenv').config();
 
@@ -23,14 +23,37 @@ const PORT = process.env.PORT || 3002;
 app.get('/', (req, res) => res.send('Hello world!'));
 
 //weather route
-app.get('/weather', (req, res) => {
-    let search = req.query.searchQuery;
-    let city = weather.find(ele => search.toLowerCase() === ele.city_name.toLowerCase());
-    let forecastDays = city.data.map(ele => new Forecast(ele));
-    if (forecastDays.length > 0) {
-        res.send(forecastDays);
-    } else {
-        res.status(500).json({ message:"No forecasts found for location."} );
+app.get('/weather', async (req, res, next) => {
+    try {
+        let cityForecast = await axios.get('https://api.weatherbit.io/v2.0/forecast/daily', {
+            params: {
+                lat: req.query.latitude,
+                lon: req.query.longitude,
+                key: process.env.WEATHER_API_KEY,
+                days: 5
+            }
+        });
+        let forecast = cityForecast.data.data.map(ele => new Forecast(ele));
+        res.send(forecast);
+    } catch (err) {
+        console.log('Error in weather');
+        next(err);
+    }
+});
+
+app.get('/movies', async(req, res, next) => {
+    try {
+        let movies = await axios.get('https://api.themoviedb.org/3/search/movie', {
+            params: {
+                query: req.query.searchQuery,
+                api_key: process.env.MOVIE_API_KEY
+            }
+        });
+        let allMovies = movies.data.results.map(movie => new Movie(movie));
+        res.send(allMovies);
+    } catch (err) {
+        console.log('Error in movies');
+        next(err);
     }
 });
 
@@ -41,7 +64,19 @@ app.get('*', (req, res) => res.send('Resource not found'));
 class Forecast {
     constructor(data) {
         this.date = data.valid_date;
-        this.description = data.weather.description
+        this.description = `Low of ${data.low_temp}, High of ${data.high_temp} with ${data.weather.description}`;
+    }
+}
+
+class Movie {
+    constructor(data) {
+        this.title = data.title;
+        this.overview = data.overview;
+        this.average_votes = data.vote_average;
+        this.total_votes = data.vote_count;
+        this.image_url = data.poster_path || '';
+        this.popularity = data.popularity;
+        this.released_on = data.release_date;
     }
 }
 
