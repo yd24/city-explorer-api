@@ -1,7 +1,7 @@
 # City-Explorer-API
 
 **Author**: Daniel Yoon
-**Version**: 1.2.0
+**Version**: 1.3.0
 
 ## Overview
 An API that returns weather data for location queries.
@@ -23,12 +23,18 @@ node.js, Express.js
 
 03-07-2023 9:31pm - Server now sends appropriate error responses.
 
+03-09-2023 11:30pm - Server now requests data from Weatherbit and TheMovieDB API.
+
 
 ## Credit and Collaborations
 
 WRRC Diagram with [Kameron Watts](https://github.com/KamWatts)
 
 https://docs.google.com/drawings/d/1_CvravyRwd3dogjs-sYbc5xsz-ksrKmdT2H8cfMStZg/edit?usp=sharing
+
+WRRC Diagram with [Thomas Lau](https://github.com/Rapib), [Anthony Keith](https://github.com/anthonykeith15)
+
+https://docs.google.com/drawings/d/1Pgy-RX4twAlV0bjiKLaIKevERk3R_PDIQPdmRVly9Oc/edit?usp=sharing
 
 ## Feature 1: Weather
 
@@ -50,3 +56,13 @@ https://docs.google.com/drawings/d/1_CvravyRwd3dogjs-sYbc5xsz-ksrKmdT2H8cfMStZg/
 * Finish time: 9:31pm
 
 * Actual time needed to complete: 31 minutes
+
+## Feature 3: Hooking up to Weatherbit and TheMovieDB API
+
+* Estimate of time needed to complete: 2 hour
+
+* Start time: 1:00pm
+
+* Finish time: 4:00pm, 9:30pm-10:30pm
+
+* Actual time needed to complete: 4 hours (had issues with free API limitations)
