@@ -1,7 +1,7 @@
 # City-Explorer-API
 
 **Author**: Daniel Yoon
-**Version**: 1.3.0
+**Version**: 1.3.1
 
 ## Overview
 An API that returns weather data for location queries.
@@ -24,6 +24,8 @@ node.js, Express.js
 03-07-2023 9:31pm - Server now sends appropriate error responses.
 
 03-09-2023 11:30pm - Server now requests data from Weatherbit and TheMovieDB API.
+
+03-10-2023 9:00am - API requests split into own modules
 
 
 ## Credit and Collaborations
