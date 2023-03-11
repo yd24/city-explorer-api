@@ -1,8 +1,9 @@
 'use-strict';
 
+const express = require('express');
 const axios = require('axios');
 
-async function getWeather(req, res) {
+async function getWeather(req, res, next) {
     try {
         let cityForecast = await axios.get('https://api.weatherbit.io/v2.0/forecast/daily', {
             params: {
@@ -15,7 +16,7 @@ async function getWeather(req, res) {
         let forecast = cityForecast.data.data.map(ele => new Forecast(ele));
         res.send(forecast).status(200);
     } catch (err) {
-        console.log('Error in weather');
+        next(err);
     }
 }
 

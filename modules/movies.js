@@ -1,8 +1,9 @@
 'use-strict';
 
+const express = require('express');
 const axios = require('axios');
 
-async function getMovies(req, res) {
+async function getMovies(req, res, next) {
     try {
         let movies = await axios.get('https://api.themoviedb.org/3/search/movie', {
             params: {
@@ -13,7 +14,7 @@ async function getMovies(req, res) {
         let allMovies = movies.data.results.map(movie => new Movie(movie));
         res.send(allMovies).status(200);
     } catch (err) {
-        console.log('Error in movies');
+        next(err);
     }
 }
 
