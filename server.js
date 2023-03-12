@@ -11,9 +11,12 @@ app.use(cors());
 app.get('/weather', weatherHandler);
 
 function weatherHandler(request, response) {
-    const { lat, lon } = request.query;
-    weather(lat, lon)
-        .then(summaries => response.send(summaries))
+    const { latitude, longitude } = request.query;
+    console.log(request.query);
+    weather.getWeather(latitude, longitude)
+        .then(summaries => {
+            response.send(summaries);
+        })
         .catch((error) => {
             console.error(error);
             response.status(200).send('Sorry. Something went wrong!')
