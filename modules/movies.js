@@ -2,17 +2,27 @@
 
 const express = require('express');
 const axios = require('axios');
+let cache = require('./cache.js');
 
-async function getMovies(req, res, next) {
+async function getMovies(req, next) {
     try {
-        let movies = await axios.get('https://api.themoviedb.org/3/search/movie', {
-            params: {
-                query: req.query.searchQuery,
-                api_key: process.env.MOVIE_API_KEY
-            }
-        });
-        let allMovies = movies.data.results.map(movie => new Movie(movie));
-        res.send(allMovies).status(200);
+        let key = 'movie-' + req.query.searchQuery;
+        if (cache[key] && Date.now() - cache[key].timestamp < 50000) {
+            console.log('Cache hit');
+        } else {
+            console.log('Cache miss');
+            let movies = await axios.get('https://api.themoviedb.org/3/search/movie', {
+                params: {
+                    query: req.query.searchQuery,
+                    api_key: process.env.MOVIE_API_KEY
+                }
+            });
+            let allMovies = movies.data.results.map(movie => new Movie(movie));
+            cache[key] = {};
+            cache[key].timestamp = Date.now();
+            cache[key].data = allMovies;
+        }
+        return cache[key];
     } catch (err) {
         next(err);
     }
@@ -30,4 +40,4 @@ class Movie {
     }
 }
 
-module.exports = getMovies;
+module.exports = { getMovies };

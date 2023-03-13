@@ -1,30 +1,40 @@
-'use-strict';
+'use strict';
 
-const express = require('express');
+let cache = require('./cache.js');
 const axios = require('axios');
 
-async function getWeather(req, res, next) {
+function getWeather(lat, lon) {
+    const key = 'weather-' + lat + lon;
+    const url = `http://api.weatherbit.io/v2.0/forecast/daily/?key=${process.env.WEATHER_API_KEY}&lang=en&lat=${lat}&lon=${lon}&days=5`;
+
+    if (cache[key] && (Date.now() - cache[key].timestamp < 50000)) {
+        console.log('Cache hit');
+    } else {
+        console.log('Cache miss');
+        cache[key] = {};
+        cache[key].timestamp = Date.now();
+        cache[key].data = axios.get(url).then(response => parseWeather(response.data));
+    }
+    return cache[key].data;
+}
+
+function parseWeather(weatherData) {
     try {
-        let cityForecast = await axios.get('https://api.weatherbit.io/v2.0/forecast/daily', {
-            params: {
-                lat: req.query.latitude,
-                lon: req.query.longitude,
-                key: process.env.WEATHER_API_KEY,
-                days: 5
-            }
+        const weatherSummaries = weatherData.data.map(day => {
+            return new Weather(day);
         });
-        let forecast = cityForecast.data.data.map(ele => new Forecast(ele));
-        res.send(forecast).status(200);
-    } catch (err) {
-        next(err);
+        return Promise.resolve(weatherSummaries);
+    } catch (e) {
+        return Promise.reject(e);
     }
 }
 
-class Forecast {
-    constructor(data) {
-        this.date = data.valid_date;
-        this.description = `Low of ${data.low_temp}, High of ${data.high_temp} with ${data.weather.description}`;
+class Weather {
+    constructor(day) {
+        this.forecast = day.weather.description;
+        this.time = day.datetime;
     }
 }
 
-module.exports = getWeather;
+module.exports = { getWeather };
+
